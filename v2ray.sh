@@ -14,15 +14,13 @@ wget -N --no-check-certificate https://raw.githubusercontent.com/FunctionClub/V2
 
 echo '#!/usr/bin/expect -f
 set timeout -1
-spawn echo "start expect" > /root/start.log
 spawn bash install.sh
 expect "*请输入默认用户名*"
-send "feek\r"
+send "admin\r"
 expect "*请输入默认登录密码*"
-send "feek\r"
+send "admin\r"
 expect "*请输入监听端口号*"
 send "444\r"
-spawn echo "finish expect" >> /root/start.log
 interact' >  /root/iv2ray.sh
 
 chmod +x /root/iv2ray.sh 
