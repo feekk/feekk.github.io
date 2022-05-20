@@ -1,0 +1,49 @@
+#!/bin/sh
+cat > /root/init.sh <<EOF
+#!/bin/sh
+apt-get install expect -y
+echo "apt-get install expect -y"
+
+sudo ufw disable
+echo "sudo ufw disable"
+# systemctl stop firewalld
+
+
+rm -rf /root/.ssh/*
+echo "rm -rf /root/.ssh/*"
+
+echo '#!/usr/bin/expect -f
+set timeout -1
+spawn ssh-keygen -t rsa
+expect "*save the key*"
+send "\r"
+expect "*passphrase*"
+send "\r"
+expect "*Enter same passphrase again*"
+send "\r"      
+interact' > /root/ikey.sh 
+
+chmod +x /root/ikey.sh
+expect /root/ikey.sh
+echo "expect /root/ikey.sh"
+
+cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
+#echo 'ssh-rsa ...' >> /root/.ssh/authorized_keys
+echo "/root/.ssh/authorized_keys"
+
+echo '#!/usr/bin/expect -f
+set timeout -1
+spawn ssh -CfNg -L {listen_port}:{remote_id}:{remote_port} root@127.0.0.1
+expect "*continue connecting*"
+send "yes\r"   
+interact' > /root/issh.sh 
+
+chmod +x /root/issh.sh
+expect /root/issh.sh
+echo "expect /root/issh.sh"
+
+nohup ssh -CfNg -L {listen_port}:{remote_id}:{remote_port} root@127.0.0.1
+echo "nohup ssh -CfNg -L"
+EOF
+
+sh  /root/init.sh >> /root/log
